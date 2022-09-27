@@ -1,19 +1,14 @@
 public class Command {
 
-    private final String name;
     private final String description;
 
     private final Runnable action;
 
-    public Command(String name, String description, Runnable action) {
-        this.name = name;
+    public Command(String description, Runnable action) {
         this.description = description;
         this.action = action;
     }
 
-    public String getName() {
-        return name;
-    }
 
     public String getDescription() {
         return description;

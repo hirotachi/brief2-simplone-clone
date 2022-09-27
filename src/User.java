@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class User implements Commander {
+public class User extends Option implements Commander {
     private final ArrayList<Command> commands = new ArrayList<Command>();
 
     private int promoId;
@@ -13,13 +13,12 @@ public class User implements Commander {
 
     private Role role;
 
-    public User(String email, int id, String password, String name, Role role, int promoId) {
+    public User(String email, int id, String password, String name, Role role) {
         this.email = email;
         this.id = id;
         this.password = password;
         this.name = name;
         this.role = role;
-        this.promoId = promoId;
     }
 
     public void assignCommands(Command... commands) {
@@ -81,5 +80,31 @@ public class User implements Commander {
 
     public ArrayList<Command> getCommands() {
         return this.commands;
+    }
+
+
+    public void assignToPromo(Boolean showConfirmation) {
+
+    }
+
+    @Override
+    public String toString() {
+        return this.getName() + " (" + this.getEmail() + ")";
+    }
+
+
+    public static void assignPromotion(Role role) {
+        ArrayList<Option> usersByRoleAsOptions = State.getUsersByRoleAsOptions(role);
+        int option = CMD.chooseOption(usersByRoleAsOptions, true);
+        if (option == 0) {
+            return;
+        }
+        User user = (User) usersByRoleAsOptions.get(option - 1);
+        Promotion.assignPromotion(user, false);
+        Logger.successln("Promotion " + user.getPromotion().getName() + " assigned to " + user.getName());
+    }
+
+    public Promotion getPromotion() {
+        return State.getPromotionById(this.getPromoId());
     }
 }
