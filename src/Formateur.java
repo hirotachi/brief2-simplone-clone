@@ -11,10 +11,6 @@ public class Formateur extends User {
                 }));
     }
 
-    @Override
-    public String toString() {
-        return "Formatteur: " + this.getName() + " " + this.getEmail();
-    }
 
     public static void createFormatteur() {
         String email = CMD.getInput("Enter formatteur email:");
@@ -32,9 +28,9 @@ public class Formateur extends User {
     }
 
     public static void listFormatteurs() {
-        Logger.logln("****************************************");
+        Logger.logln("Formatteurs: ****************************************");
         CMD.listOptions(State.getUsersByRoleAsOptions(Role.FORMATTEUR));
-        Logger.logln("****************************************");
+        Logger.logln("*****************************************************");
     }
 
 

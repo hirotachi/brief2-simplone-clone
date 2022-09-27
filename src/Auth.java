@@ -5,9 +5,9 @@ public class Auth {
     private static Role LoggedInRole;
 
     public static void authenticate() {
-        String email = CMD.getInput("Enter your email: ");
+        String username = CMD.getInput("Enter your email/Username: ");
         String password = CMD.getHiddenInput("Enter your password: ");
-        admin = State.getAdminByUsername(email);
+        admin = State.getAdminByUsername(username);
         if (admin != null && !admin.verifyPassword(password)) {
             authenticate(true);
             return;
@@ -17,7 +17,7 @@ public class Auth {
             setLoggedInRole(Role.ADMIN);
             return;
         }
-        user = State.getUserByEmail(email);
+        user = State.getUserByEmail(username);
         if (user == null || !user.verifyPassword(password)) {
             authenticate(true);
             return;

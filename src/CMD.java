@@ -5,34 +5,54 @@ import java.util.Scanner;
 public class CMD {
 
     public static void welcome() {
-        System.out.println("Welcome to Simplon");
+        Logger.logln("Welcome to Simplon");
     }
 
-    private static void listCommands(ArrayList<Command> commands) {
-        System.out.println("List of commands:");
-        for (int i = 0; i < commands.size(); i++) {
-            Command command = commands.get(i);
-            System.out.println(i + 1 + " - " + command.getDescription());
+    private static void listCommands(ArrayList<Command> commands, boolean hideAll) {
+        if (!hideAll) {
+            Logger.logln("List of commands:");
+            for (int i = 0; i < commands.size(); i++) {
+                Command command = commands.get(i);
+                Logger.logln(i + 1 + " - " + command.getDescription());
+            }
         }
-        System.out.println(0 + " - " + "Help: Show list of commands.");
-        System.out.println(-1 + " - " + "Exit: Quit the program.");
+
+        if (!hideAll) {
+            Logger.logln(-1 + " - " + "Exit: Quit the program.");
+            Logger.logln(-2 + " - " + "Logout: Logout from the current user.");
+            Logger.logln(-3 + " - " + "Clear: Clear the screen.");
+        }
+        Logger.logln(0 + " - " + "Help: Show list of commands.");
+
     }
 
-    public static void listAndListen(ArrayList<Command> commands) {
-        listCommands(commands);
+    public static void listAndListen(ArrayList<Command> commands, boolean hideAll) {
+        listCommands(commands, hideAll);
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter a command number: ");
 
         int commandIndex = scanner.nextInt();
-        if (commandIndex == 0) {
-            listAndListen(commands);
-            return;
+        switch (commandIndex) {
+            case 0 -> {
+                listAndListen(commands);
+                return;
+            }
+            case -1 -> {
+                Logger.logln("Goodbye!");
+                return;
+            }
+            case -2 -> {
+                Auth.logout();
+                Main.start(); // Restart the program
+                return;
+            }
+            case -3 -> {
+                clearScreen();
+                listAndListen(commands);
+                return;
+            }
         }
-        if (commandIndex == -1) {
-            Logger.logln("Goodbye!");
-            return;
-        }
-        if (commandIndex < 1 || commandIndex >= commands.size()) {
+        if (commandIndex < 1 || commandIndex >= commands.size() + 1) {
             Logger.errorln("Invalid command number, please choose from list.");
             listAndListen(commands);
             return;
@@ -40,24 +60,32 @@ public class CMD {
 
         Command command = commands.get(commandIndex - 1);
         command.run();
-        listAndListen(commands);
+        listAndListen(commands, true);
+    }
+
+    public static void listAndListen(ArrayList<Command> commands) {
+        listAndListen(commands, false);
+    }
+
+    private static void clearScreen() {
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
     }
 
     public static String getInput(String message) {
-        System.out.println(message);
+        Logger.logln(message);
         Scanner scanner = new Scanner(System.in);
         return scanner.nextLine();
     }
 
     public static boolean getConfirmation(String message) {
-        System.out.println(message + " (y/n)");
-        Scanner scanner = new Scanner(System.in);
-        String input = scanner.nextLine();
-        return input.equals("y");
+        String input = getInput(message + " (y/n or yes/no) default is no").trim().toLowerCase();
+        return input.equals("y") || input.equals("yes");
+
     }
 
     public static String getHiddenInput(String message) {
-        System.out.println(message);
+        Logger.logln(message);
         Console console = System.console();
         if (console == null) {
             Scanner scanner = new Scanner(System.in);
@@ -83,10 +111,13 @@ public class CMD {
     public static int chooseOption(ArrayList<Option> options, boolean withCancelOption) {
         listOptions(options, withCancelOption);
 
-        System.out.println("Please choose an option: ");
+        Logger.logln("Please choose an option: ");
         Scanner scanner = new Scanner(System.in);
         int option = scanner.nextInt();
-        if (option < 1 || option > options.size()) {
+        if (option == 0 && withCancelOption) {
+            return 0;
+        }
+        if (option < (withCancelOption ? 0 : 1) || option > options.size()) {
             Logger.errorln("Invalid option, please choose from list.");
             return chooseOption(options);
         }

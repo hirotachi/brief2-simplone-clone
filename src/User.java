@@ -89,7 +89,7 @@ public class User extends Option implements Commander {
 
     @Override
     public String toString() {
-        return this.getName() + " (" + this.getEmail() + ")";
+        return this.getName() + " - (" + this.getEmail() + ")" + (this.getPromotion() != null ? " - " + this.getPromotion().getName() : "");
     }
 
 
@@ -97,6 +97,7 @@ public class User extends Option implements Commander {
         ArrayList<Option> usersByRoleAsOptions = State.getUsersByRoleAsOptions(role);
         int option = CMD.chooseOption(usersByRoleAsOptions, true);
         if (option == 0) {
+            Logger.warningln("Cancelled promotion assignment");
             return;
         }
         User user = (User) usersByRoleAsOptions.get(option - 1);
@@ -107,4 +108,5 @@ public class User extends Option implements Commander {
     public Promotion getPromotion() {
         return State.getPromotionById(this.getPromoId());
     }
+
 }

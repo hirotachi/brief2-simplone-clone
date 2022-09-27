@@ -64,4 +64,10 @@ public class Promotion extends Option {
         user.setPromoId(promotion.getId());
     }
 
+
+    public static void listPromotions() {
+        Logger.logln("Promotions: ****************************************");
+        CMD.listOptions(State.getPromotionsAsOptions());
+        Logger.logln("****************************************************");
+    }
 }

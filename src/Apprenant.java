@@ -20,8 +20,8 @@ public class Apprenant extends User {
     }
 
     public static void listApprenants() {
-        Logger.logln("****************************************");
+        Logger.logln("Apprenant: ****************************************");
         CMD.listOptions(State.getUsersByRoleAsOptions(Role.APPRENANT));
-        Logger.logln("****************************************");
+        Logger.logln("***************************************************");
     }
 }

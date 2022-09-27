@@ -18,6 +18,7 @@ public class Admin implements Commander {
                 new Command("Create Apprenant", Apprenant::createApprenant),
                 new Command("List Formatteurs", Formateur::listFormatteurs),
                 new Command("List Apprenant", Apprenant::listApprenants),
+                new Command("List Promotions", Promotion::listPromotions),
                 new Command("Assign Formatteur to promotion", () -> {
                     User.assignPromotion(Role.FORMATTEUR);
                 }),
