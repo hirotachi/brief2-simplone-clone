@@ -9,7 +9,7 @@ public class State {
     public static void load() {
         usersByEmail = new HashMap<>();
         adminsByUsername = new HashMap<>();
-        usersByEmail.put("said", new Formateur("said", 1, "said", "said", Role.FORMATTEUR, 1));
+        usersByEmail.put("said", new Formateur("said", 1, "said", "said", 1));
         adminsByUsername.put("admin", new Admin("admin", "admin"));
     }
 
