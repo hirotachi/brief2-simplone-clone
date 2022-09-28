@@ -7,7 +7,7 @@ public class Apprenant extends User {
     }
 
     public static void create() {
-        String email = CMD.getInput("Enter apprenant email:");
+        String email = CMD.getInput("Enter apprenant email:").toLowerCase();
         boolean exists = User.getByEmail(email) != null;
         if (exists) {
             Logger.errorln("Email already used");

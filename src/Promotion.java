@@ -19,7 +19,7 @@ public class Promotion extends Option {
         return nextId++;
     }
 
-    public static ArrayList<Option> getAsOptions() {
+    public static ArrayList<Option> asOptions() {
         return new ArrayList<>(listById.values());
     }
 
@@ -100,7 +100,7 @@ public class Promotion extends Option {
         }
 
 
-        int option = CMD.chooseOption(getAsOptions());
+        int option = CMD.chooseOption(asOptions());
         if (option == -1) return;
         Promotion promotion = getById(option);
         user.setPromoId(promotion.getId());
@@ -108,7 +108,7 @@ public class Promotion extends Option {
 
 
     public static void list() {
-        ArrayList<Option> asOptions = getAsOptions();
+        ArrayList<Option> asOptions = asOptions();
         int size = asOptions.size();
         if (size == 0) {
             Logger.warningln("No promotions found");

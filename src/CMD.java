@@ -83,7 +83,7 @@ public class CMD {
     public static String getInput(String message) {
         Logger.logln(message);
         Scanner scanner = new Scanner(System.in);
-        return scanner.nextLine();
+        return scanner.nextLine().trim();
     }
 
     public static boolean getConfirmation(String message) {
@@ -99,7 +99,7 @@ public class CMD {
             Scanner scanner = new Scanner(System.in);
             return scanner.nextLine();
         }
-        return new String(console.readPassword());
+        return new String(console.readPassword()).trim();
     }
 
 

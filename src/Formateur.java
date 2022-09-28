@@ -5,17 +5,18 @@ public class Formateur extends User {
     public Formateur(String email, int id, String password, String name) {
         super(email, id, password, name, Role.FORMATTEUR);
         this.assignCommands(
-                new Command("Add brief", () -> {
-                    System.out.println("Create brief");
-                }),
-                new Command("Update brief", () -> {
-                    System.out.println("Update brief");
-                }));
+                new Command("Add brief", Brief::create),
+                new Command("Publish a brief", Brief::publish),
+                new Command("List briefs", Brief::list),
+                new Command("Assign Apprenant to Promotion", () -> {
+                    User.assignPromotion(Role.APPRENANT);
+                })
+        );
     }
 
 
     public static void create() {
-        String email = CMD.getInput("Enter formatteur email:");
+        String email = CMD.getInput("Enter formatteur email:").toLowerCase();
         boolean exists = User.getByEmail(email) != null;
         if (exists) {
             Logger.errorln("Email already used");

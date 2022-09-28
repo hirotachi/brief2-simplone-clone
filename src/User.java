@@ -148,7 +148,9 @@ public class User extends Option implements Commander {
     public static void assignPromotion(Role role) {
         int count = Promotion.count();
         if (count == 0) {
-            Logger.errorln("No promotions found, create one first");
+            Logger.errorln("No promotions found, one needs to be created first");
+            if(Auth.getAdmin() == null) return; // only admins can create promotions
+
             boolean createPromotion = CMD.getConfirmation("Create a promotion?");
             if (!createPromotion) return;
             Promotion.create();

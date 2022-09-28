@@ -5,7 +5,7 @@ public class Auth {
     private static Role LoggedInRole;
 
     public static void authenticate() {
-        String username = CMD.getInput("Enter your email/Username: ");
+        String username = CMD.getInput("Enter your email/Username: ").toLowerCase();
         String password = CMD.getHiddenInput("Enter your password: ");
         admin = Admin.getAdminByUsername(username);
         if (admin != null && !admin.verifyPassword(password)) {
