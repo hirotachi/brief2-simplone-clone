@@ -148,9 +148,10 @@ public class User extends Option implements Commander {
     public static void assignPromotion(Role role) {
         int count = Promotion.count();
         if (count == 0) {
-            Logger.errorln("No promotions found");
-            return;
-
+            Logger.errorln("No promotions found, create one first");
+            boolean createPromotion = CMD.getConfirmation("Create a promotion?");
+            if (!createPromotion) return;
+            Promotion.create();
         }
         ArrayList<Option> usersByRoleAsOptions = asOptions(role);
         int option = CMD.chooseOption(usersByRoleAsOptions, true);

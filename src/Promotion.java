@@ -89,6 +89,11 @@ public class Promotion extends Option {
     }
 
     public static void assignPromotion(User user, boolean askConfirmation) {
+        if(listById.size() == 0 && askConfirmation) {
+            Logger.errorln("No promotion found");
+            return;
+        }
+
         if (askConfirmation) {
             boolean confirmation = CMD.getConfirmation("Would you like to assign a promotion to this user?");
             if (!confirmation) return;

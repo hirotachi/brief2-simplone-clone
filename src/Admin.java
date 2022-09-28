@@ -21,16 +21,16 @@ public class Admin implements Commander {
         assignCommands(
                 new Command("Create formatteur", Formateur::create),
                 new Command("Create Apprenant", Apprenant::create),
+                new Command("Create Promotion", Promotion::create),
                 new Command("List Formatteurs", Formateur::list),
-                new Command("List Apprenant", Apprenant::listApprenants),
+                new Command("List Apprenant", Apprenant::list),
                 new Command("List Promotions", Promotion::list),
                 new Command("Assign Formatteur to promotion", () -> {
                     User.assignPromotion(Role.FORMATTEUR);
                 }),
                 new Command("Assign Apprenant to promotion", () -> {
                     User.assignPromotion(Role.APPRENANT);
-                }),
-                new Command("Create Promotion", Promotion::create)
+                })
         );
     }
 

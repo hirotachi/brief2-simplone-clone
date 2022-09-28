@@ -21,9 +21,14 @@ public class Apprenant extends User {
         Logger.successln("Apprenant (" + apprenant.getName() + ") created successfully");
     }
 
-    public static void listApprenants() {
+    public static void list() {
         ArrayList<Option> apprenant = User.asOptions(Role.APPRENANT);
-        Logger.logln("Apprenant (" + apprenant.size() + "): ****************************************");
+        int size = apprenant.size();
+        if(size == 0) {
+            Logger.warningln("No apprenants found");
+            return;
+        }
+        Logger.logln("Apprenant (" + size + "): ****************************************");
         CMD.listOptions(apprenant);
         Logger.logln("***************************************************");
     }
