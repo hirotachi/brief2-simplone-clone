@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class Formateur extends User {
 
     public Formateur(String email, int id, String password, String name) {
@@ -12,26 +14,42 @@ public class Formateur extends User {
     }
 
 
-    public static void createFormatteur() {
+    public static void create() {
         String email = CMD.getInput("Enter formatteur email:");
-        boolean exists = State.getUserByEmail(email) != null;
+        boolean exists = User.getByEmail(email) != null;
         if (exists) {
             Logger.errorln("Email already used");
-            createFormatteur();
+            create();
             return;
         }
         String name = CMD.getInput("Enter formatteur name:");
         String password = CMD.getHiddenInput("Enter formatteur password:");
-        Formateur formateur = State.addFormatteur(email, name, password);
+        Formateur formateur = add(email, name, password);
         Promotion.assignPromotion(formateur, true);
         Logger.successln("Formatteur (" + formateur.getName() + ") created successfully");
     }
 
-    public static void listFormatteurs() {
-        Logger.logln("Formatteurs: ****************************************");
-        CMD.listOptions(State.getUsersByRoleAsOptions(Role.FORMATTEUR));
+    public static void list() {
+        ArrayList<Option> formatteurs = asOptions();
+
+        int size = formatteurs.size();
+        if (size == 0) {
+            Logger.warningln("No formatteurs found");
+            return;
+        }
+        Logger.logln("Formatteurs (" + size + "): ****************************************");
+        CMD.listOptions(formatteurs);
         Logger.logln("*****************************************************");
     }
 
 
+    public static Formateur add(String email, String name, String password) {
+        Formateur formateur = new Formateur(email, getNextUserId(), password, name);
+        addUser(formateur);
+        return formateur;
+    }
+
+    private static ArrayList<Option> asOptions() {
+        return User.asOptions(Role.FORMATTEUR);
+    }
 }

@@ -1,7 +1,11 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 public class User extends Option implements Commander {
+    protected static HashMap<String, User> usersByEmail;
+    protected static HashMap<Integer, User> usersById;
+    private static int nextUserId = 1;
     private final ArrayList<Command> commands = new ArrayList<Command>();
 
     private int promoId;
@@ -19,6 +23,54 @@ public class User extends Option implements Commander {
         this.password = password;
         this.name = name;
         this.role = role;
+    }
+
+    public static void parseAndLoad(HashMap<String, User> usersByEmail) {
+        User.usersByEmail = usersByEmail;
+        User.usersById = new HashMap<>();
+        for (User user : usersByEmail.values()) {
+            usersById.put(user.getId(), user);
+        }
+    }
+
+    public static User getByEmail(String email) {
+        return usersByEmail.get(email);
+    }
+
+    public static void addUser(User user) {
+        if (User.usersByEmail.containsKey(user.getEmail())) {
+            throw new RuntimeException("Email already exists");
+        }
+        usersByEmail.put(user.getEmail(), user);
+        usersById.put(user.getId(), user);
+    }
+
+    static int getNextUserId() {
+        return nextUserId++;
+    }
+
+    public static ArrayList<User> getUsersByPromoId(int promoId) {
+        ArrayList<User> users = new ArrayList<>();
+        for (User user : usersByEmail.values()) {
+            if (user.getPromoId() == promoId) {
+                users.add(user);
+            }
+        }
+        return users;
+    }
+
+    public static ArrayList<Option> asOptions(Role role) {
+        ArrayList<Option> options = new ArrayList<>();
+        for (User user : usersByEmail.values()) {
+            if (user.getRole() == role) {
+                options.add(user);
+            }
+        }
+        return options;
+    }
+
+    private static ArrayList<Option> asOptions() {
+        return new ArrayList<>(usersByEmail.values());
     }
 
     public void assignCommands(Command... commands) {
@@ -94,19 +146,29 @@ public class User extends Option implements Commander {
 
 
     public static void assignPromotion(Role role) {
-        ArrayList<Option> usersByRoleAsOptions = State.getUsersByRoleAsOptions(role);
+        int count = Promotion.count();
+        if (count == 0) {
+            Logger.errorln("No promotions found");
+            return;
+
+        }
+        ArrayList<Option> usersByRoleAsOptions = asOptions(role);
         int option = CMD.chooseOption(usersByRoleAsOptions, true);
         if (option == 0) {
             Logger.warningln("Cancelled promotion assignment");
             return;
         }
-        User user = (User) usersByRoleAsOptions.get(option - 1);
+        User user = (User) usersByRoleAsOptions.get(option);
         Promotion.assignPromotion(user, false);
         Logger.successln("Promotion " + user.getPromotion().getName() + " assigned to " + user.getName());
     }
 
     public Promotion getPromotion() {
-        return State.getPromotionById(this.getPromoId());
+        return Promotion.getById(this.getPromoId());
+    }
+
+    public static User getById(int id) {
+        return usersById.get(id);
     }
 
 }

@@ -1,5 +1,6 @@
 import java.io.Console;
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class CMD {
@@ -29,9 +30,16 @@ public class CMD {
     public static void listAndListen(ArrayList<Command> commands, boolean hideAll) {
         listCommands(commands, hideAll);
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter a command number: ");
+        Logger.log("Enter a command number: ");
 
-        int commandIndex = scanner.nextInt();
+        int commandIndex = 0;
+        try {
+            commandIndex = scanner.nextInt();
+        } catch (InputMismatchException e) {
+            Logger.errorln("Invalid command");
+            listAndListen(commands, hideAll);
+            return;
+        }
         switch (commandIndex) {
             case 0 -> {
                 listAndListen(commands);
@@ -115,17 +123,22 @@ public class CMD {
         Scanner scanner = new Scanner(System.in);
         int option = scanner.nextInt();
         if (option == 0 && withCancelOption) {
-            return 0;
+            return -1;
         }
         if (option < (withCancelOption ? 0 : 1) || option > options.size()) {
             Logger.errorln("Invalid option, please choose from list.");
             return chooseOption(options);
         }
-        return option;
+        return option - 1;
     }
 
     public static int chooseOption(ArrayList<Option> options) {
         return chooseOption(options, false);
     }
 
+    public static int getIntInput(String message) {
+        Logger.logln(message);
+        Scanner scanner = new Scanner(System.in);
+        return scanner.nextInt();
+    }
 }

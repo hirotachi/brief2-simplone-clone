@@ -1,114 +1,39 @@
-import java.util.ArrayList;
+import netscape.javascript.JSObject;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 
 public class State {
 
-    private static HashMap<String, User> usersByEmail;
-    private static HashMap<String, Admin> adminsByUsername;
-
-    private static HashMap<Integer, Promotion> promotionsById;
-
-    private static int nextUserId = 1;
-    private static int nextPromoId = 1;
-
-    private static int nextAdminId = 1;
-
 
     public static void load() {
-        usersByEmail = new HashMap<>();
-        adminsByUsername = new HashMap<>();
-        promotionsById = new HashMap<>();
+        User.parseAndLoad(new HashMap<>());
+        Admin.parseAndLoad(new HashMap<>());
+        Promotion.parseAndLoad(new HashMap<>());
+        readJSONState();
 
-//        static data for testing
 
-        addFormatteur("formatteur", "formatteur", "formatteur");
-        addApprenant("apprenant", "apprenant", "apprenant");
-        addAdmin("admin", "admin");
-        addPromotion("Promotion 1");
-        addPromotion("Promotion 2");
+        Formateur.add("formatteur", "formatteur", "formatteur");
+        Apprenant.add("apprenant", "apprenant", "apprenant");
+        Admin.add("admin", "admin");
+        Promotion.add("Promotion 1", 2022);
+        Promotion.add("Promotion 2", 2022);
     }
 
-    public static User getUserByEmail(String email) {
-        return usersByEmail.get(email);
-    }
-
-    public static Admin getAdminByUsername(String username) {
-        return adminsByUsername.get(username);
-    }
-
-    public static void addUser(User user) {
-        usersByEmail.put(user.getEmail(), user);
-    }
-
-    public static void addAdmin(String username, String password) {
-        Admin admin = new Admin(username, password, getNextAdminId());
-        adminsByUsername.put(admin.getUsername(), admin);
-    }
+    private static JSObject readJSONState() {
+        try {
+            String text = Files.readString(Paths.get("test.json"));
+//            convert text to JSObject
 
 
-    public static Formateur addFormatteur(String email, String name, String password) {
-        if (usersByEmail.containsKey(email)) {
-            throw new RuntimeException("Email already exists");
+        } catch (IOException e) {
+
+            Logger.errorln(e.toString());
         }
-        Formateur formateur = new Formateur(email, getNextUserId(), password, name);
-        usersByEmail.put(email, formateur);
-        return formateur;
-    }
-
-    public static Apprenant addApprenant(String email, String name, String password) {
-        if (usersByEmail.containsKey(email)) {
-            throw new RuntimeException("Email already exists");
-        }
-        Apprenant apprenant = new Apprenant(email, getNextUserId(), password, name);
-        usersByEmail.put(email, apprenant);
-        return apprenant;
-    }
-
-    private static int getNextUserId() {
-        return nextUserId++;
-    }
-
-    private static int getNextPromoId() {
-        return nextPromoId++;
-    }
-
-    private static int getNextAdminId() {
-        return nextAdminId++;
-    }
-
-    public static ArrayList<User> getUsersByPromoId(int promoId) {
-        ArrayList<User> users = new ArrayList<>();
-        for (User user : usersByEmail.values()) {
-            if (user.getPromoId() == promoId) {
-                users.add(user);
-            }
-        }
-        return users;
+        return null;
     }
 
 
-    public static ArrayList<Option> getPromotionsAsOptions() {
-        return new ArrayList<>(promotionsById.values());
-    }
-
-    public static ArrayList<Option> getUsersByRoleAsOptions(Role role) {
-        ArrayList<Option> options = new ArrayList<>();
-        for (User user : usersByEmail.values()) {
-            if (user.getRole() == role) {
-                options.add(user);
-            }
-        }
-        return options;
-    }
-
-
-    public static Promotion getPromotionById(int id) {
-        return promotionsById.get(id);
-    }
-
-    public static Promotion addPromotion(String name) {
-        Promotion promotion = new Promotion(name, getNextPromoId());
-        promotionsById.put(promotion.getId(), promotion);
-        return promotion;
-    }
 }

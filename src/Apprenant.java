@@ -1,27 +1,36 @@
+import java.util.ArrayList;
+
 public class Apprenant extends User {
 
     public Apprenant(String email, int id, String password, String name) {
         super(email, id, password, name, Role.APPRENANT);
     }
 
-    public static void createApprenant() {
+    public static void create() {
         String email = CMD.getInput("Enter apprenant email:");
-        boolean exists = State.getUserByEmail(email) != null;
+        boolean exists = User.getByEmail(email) != null;
         if (exists) {
             Logger.errorln("Email already used");
-            createApprenant();
+            create();
             return;
         }
         String name = CMD.getInput("Enter apprenant name:");
         String password = CMD.getHiddenInput("Enter apprenant password:");
-        Apprenant apprenant = State.addApprenant(email, name, password);
+        Apprenant apprenant = add(email, name, password);
         Promotion.assignPromotion(apprenant, true);
         Logger.successln("Apprenant (" + apprenant.getName() + ") created successfully");
     }
 
     public static void listApprenants() {
-        Logger.logln("Apprenant: ****************************************");
-        CMD.listOptions(State.getUsersByRoleAsOptions(Role.APPRENANT));
+        ArrayList<Option> apprenant = User.asOptions(Role.APPRENANT);
+        Logger.logln("Apprenant (" + apprenant.size() + "): ****************************************");
+        CMD.listOptions(apprenant);
         Logger.logln("***************************************************");
+    }
+
+    public static Apprenant add(String email, String name, String password) {
+        Apprenant apprenant = new Apprenant(email, getNextUserId(), password, name);
+        addUser(apprenant);
+        return apprenant;
     }
 }

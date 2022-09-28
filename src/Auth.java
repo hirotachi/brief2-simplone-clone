@@ -7,7 +7,7 @@ public class Auth {
     public static void authenticate() {
         String username = CMD.getInput("Enter your email/Username: ");
         String password = CMD.getHiddenInput("Enter your password: ");
-        admin = State.getAdminByUsername(username);
+        admin = Admin.getAdminByUsername(username);
         if (admin != null && !admin.verifyPassword(password)) {
             authenticate(true);
             return;
@@ -17,7 +17,7 @@ public class Auth {
             setLoggedInRole(Role.ADMIN);
             return;
         }
-        user = State.getUserByEmail(username);
+        user = User.getByEmail(username);
         if (user == null || !user.verifyPassword(password)) {
             authenticate(true);
             return;
