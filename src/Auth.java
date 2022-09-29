@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class Auth {
     private static User user;
     private static Admin admin;
@@ -30,6 +32,7 @@ public class Auth {
 
         authenticate(true);
 
+
     }
 
     public static void authenticate(Boolean showError) {
@@ -40,7 +43,9 @@ public class Auth {
     }
 
     public static void logout() {
-        user = null;
+        setUser(null);
+        setAdmin(null);
+        setLoggedInRole(null);
         Logger.logln("You have been logged out!");
     }
 

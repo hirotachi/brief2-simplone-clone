@@ -8,7 +8,6 @@ public class Admin implements Commander {
     private static HashMap<String, Admin> adminsByUsername;
     private static int nextAdminId = 1;
 
-    private final ArrayList<Command> commands = new ArrayList<Command>();
     private final String username;
     private final String password;
 
@@ -18,20 +17,6 @@ public class Admin implements Commander {
         this.username = username;
         this.password = password;
         this.id = id;
-        assignCommands(
-                new Command("Create formatteur", Formateur::create),
-                new Command("Create Apprenant", Apprenant::create),
-                new Command("Create Promotion", Promotion::create),
-                new Command("List Formatteurs", Formateur::list),
-                new Command("List Apprenant", Apprenant::list),
-                new Command("List Promotions", Promotion::list),
-                new Command("Assign Formatteur to promotion", () -> {
-                    User.assignPromotion(Role.FORMATTEUR);
-                }),
-                new Command("Assign Apprenant to promotion", () -> {
-                    User.assignPromotion(Role.APPRENANT);
-                })
-        );
     }
 
     public static Admin getAdminByUsername(String username) {
@@ -46,14 +31,23 @@ public class Admin implements Commander {
         return username;
     }
 
-    @Override
-    public void assignCommands(Command... commands) {
-        this.commands.addAll(Arrays.asList(commands));
-    }
 
-    @Override
-    public ArrayList<Command> getCommands() {
-        return commands;
+    public static ArrayList<Command> getCommands() {
+        return new ArrayList<>() {{
+            add(new Command("Create formatteur", Formateur::create));
+            add(new Command("Create Apprenant", Apprenant::create));
+            add(new Command("Create Promotion", Promotion::create));
+            add(new Command("List Formatteurs", Formateur::list));
+            add(new Command("List Apprenant", Apprenant::list));
+            add(new Command("List Promotions", Promotion::list));
+            add(new Command("Assign Formatteur to promotion", () -> {
+                User.assignPromotion(Role.FORMATTEUR);
+            }));
+            add(new Command("Assign Apprenant to promotion", () -> {
+                User.assignPromotion(Role.APPRENANT);
+            }));
+
+        }};
     }
 
 

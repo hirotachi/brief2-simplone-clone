@@ -1,9 +1,21 @@
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class Apprenant extends User {
 
     public Apprenant(String email, int id, String password, String name) {
         super(email, id, password, name, Role.APPRENANT);
+    }
+
+    public static ArrayList<Command> getCommands() {
+        User user = Auth.getUser();
+        if(user.getPromotion() == null) return new ArrayList<>();
+        return new ArrayList<>() {{
+            add(new Command("List Briefs", () -> {
+                user.setLastBriefReadDate(LocalDateTime.now());
+                Brief.listAssigned();
+            }));
+        }};
     }
 
     public static void create() {

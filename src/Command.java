@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class Command {
 
     private final String description;
@@ -16,5 +18,14 @@ public class Command {
 
     public void run() {
         action.run();
+    }
+
+
+    public static ArrayList<Command> getCurrentUserCommands(){
+        return switch (Auth.getLoggedInRole()) {
+            case FORMATTEUR -> Formateur.getCommands();
+            case APPRENANT -> Apprenant.getCommands();
+            case ADMIN -> Admin.getCommands();
+        };
     }
 }

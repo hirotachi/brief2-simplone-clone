@@ -4,14 +4,18 @@ public class Formateur extends User {
 
     public Formateur(String email, int id, String password, String name) {
         super(email, id, password, name, Role.FORMATTEUR);
-        this.assignCommands(
-                new Command("Add brief", Brief::create),
-                new Command("Publish a brief", Brief::publish),
-                new Command("List briefs", Brief::list),
-                new Command("Assign Apprenant to Promotion", () -> {
-                    User.assignPromotion(Role.APPRENANT);
-                })
-        );
+    }
+
+    public static ArrayList<Command> getCommands() {
+        if(Auth.getUser().getPromotion() == null) return new ArrayList<>();
+        return new ArrayList<>() {{
+            add(new Command("Add brief", Brief::create));
+            add(new Command("Publish a brief", Brief::publish));
+            add(new Command("List briefs", Brief::list));
+            add(new Command("Assign Apprenant to Promotion", () -> {
+                User.assignPromotion(Role.APPRENANT);
+            }));
+        }};
     }
 
 

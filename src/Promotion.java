@@ -100,9 +100,10 @@ public class Promotion extends Option {
         }
 
 
-        int option = CMD.chooseOption(asOptions());
+        ArrayList<Option> options = asOptions();
+        int option = CMD.chooseOption(options);
         if (option == -1) return;
-        Promotion promotion = getById(option);
+        Promotion promotion = (Promotion) options.get(option);
         user.setPromoId(promotion.getId());
     }
 

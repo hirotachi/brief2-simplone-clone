@@ -1,3 +1,4 @@
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -6,7 +7,7 @@ public class User extends Option implements Commander {
     protected static HashMap<String, User> usersByEmail;
     protected static HashMap<Integer, User> usersById;
     private static int nextUserId = 1;
-    private final ArrayList<Command> commands = new ArrayList<Command>();
+    private LocalDateTime lastBriefReadDate;
 
     private int promoId;
     private String email;
@@ -73,9 +74,7 @@ public class User extends Option implements Commander {
         return new ArrayList<>(usersByEmail.values());
     }
 
-    public void assignCommands(Command... commands) {
-        this.commands.addAll(Arrays.asList(commands));
-    }
+
 
     public boolean verifyPassword(String password) {
         return this.password.equals(password);
@@ -130,8 +129,8 @@ public class User extends Option implements Commander {
         this.promoId = promoId;
     }
 
-    public ArrayList<Command> getCommands() {
-        return this.commands;
+    public static ArrayList<Command> getCommands() {
+        return new ArrayList<>();
     }
 
 
@@ -157,7 +156,7 @@ public class User extends Option implements Commander {
         }
         ArrayList<Option> usersByRoleAsOptions = asOptions(role);
         int option = CMD.chooseOption(usersByRoleAsOptions, true);
-        if (option == 0) {
+        if (option == -1) {
             Logger.warningln("Cancelled promotion assignment");
             return;
         }
@@ -167,6 +166,7 @@ public class User extends Option implements Commander {
     }
 
     public Promotion getPromotion() {
+        if(this.getPromoId() == 0) return null;
         return Promotion.getById(this.getPromoId());
     }
 
@@ -174,4 +174,11 @@ public class User extends Option implements Commander {
         return usersById.get(id);
     }
 
+    public LocalDateTime getLastBriefReadDate() {
+        return lastBriefReadDate;
+    }
+
+    public void setLastBriefReadDate(LocalDateTime lastBriefReadDate) {
+        this.lastBriefReadDate = lastBriefReadDate;
+    }
 }

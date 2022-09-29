@@ -125,7 +125,7 @@ public class CMD {
         if (option == 0 && withCancelOption) {
             return -1;
         }
-        if (option < (withCancelOption ? 0 : 1) || option > options.size()) {
+        if (option < 1 || option > options.size()) {
             Logger.errorln("Invalid option, please choose from list.");
             return chooseOption(options);
         }
@@ -141,4 +141,6 @@ public class CMD {
         Scanner scanner = new Scanner(System.in);
         return scanner.nextInt();
     }
+
+
 }

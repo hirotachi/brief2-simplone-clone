@@ -5,6 +5,7 @@ public class Brief extends Option {
 
     private static int nextId = 1;
     private static HashMap<Integer, Brief> listById;
+    private static HashMap<Integer, ArrayList<Brief>> listByPromoId;
     private final String name;
 
     private boolean published;
@@ -12,12 +13,26 @@ public class Brief extends Option {
     private final int id;
     private final String description;
     private final int authorId;
+    private final int promoId;
 
-    public Brief(String name, int id, String description, int authorId) {
+    public Brief(String name, int id, String description, int authorId, int promoId) {
         this.name = name;
         this.id = id;
         this.description = description;
         this.authorId = authorId;
+        this.promoId = promoId;
+    }
+
+    public static void parseAndLoad(HashMap<Integer, Brief> state) {
+        Brief.listById = state;
+        Brief.listByPromoId = new HashMap<>();
+        for (Brief brief : state.values()) {
+            addBriefToPromo(brief);
+        }
+    }
+
+    private Integer getPromoId() {
+        return promoId;
     }
 
     public String getName() {
@@ -34,9 +49,18 @@ public class Brief extends Option {
 
 
     public static Brief add(String name, String description) {
-        Brief brief = new Brief(name, getNextId(), description, Auth.getUser().getId());
+        User user = Auth.getUser();
+        Brief brief = new Brief(name, getNextId(), description, user.getId(), user.getPromoId());
         listById.put(brief.getId(), brief);
+        addBriefToPromo(brief);
         return brief;
+    }
+
+    private static void addBriefToPromo(Brief brief) {
+        if (!listByPromoId.containsKey(brief.getPromoId())) {
+            listByPromoId.put(brief.getPromoId(), new ArrayList<>());
+        }
+        listByPromoId.get(brief.getPromoId()).add(brief);
     }
 
     public static void create() {
@@ -52,12 +76,10 @@ public class Brief extends Option {
             boolean publish = CMD.getConfirmation("Do you want to publish the brief ?");
             brief.setPublished(publish);
         }
+        Logger.successln("Brief created successfully");
     }
 
     public static void publish() {
-//         list all briefs created by user or show that list is empty
-//         get option from user
-//        set selected brief to published
         ArrayList<Brief> briefs = getByAuthorId(Auth.getUser().getId());
         if (briefs.size() == 0) {
             Logger.errorln("You have no briefs to publish");
@@ -128,8 +150,16 @@ public class Brief extends Option {
         return new ArrayList<>(listById.values());
     }
 
+    public static ArrayList<Option> asOptions(int promoId) {
+        return new ArrayList<>(getByPromoId(promoId));
+    }
+
     public static void list() {
         ArrayList<Option> briefs = asOptions();
+        list(briefs);
+    }
+
+    private static void list(ArrayList<Option> briefs) {
         int size = briefs.size();
         if (size == 0) {
             Logger.warningln("No briefs found");
@@ -138,5 +168,22 @@ public class Brief extends Option {
         Logger.logln("Briefs (" + size + "): ****************************************");
         CMD.listOptions(briefs);
         Logger.logln("*****************************************************");
+    }
+
+    public static void listAssigned() {
+        ArrayList<Option> briefs = asOptions(Auth.getUser().getPromoId());
+        list(briefs);
+    }
+
+    private static ArrayList<Brief> getByPromoId(int promoId) {
+        ArrayList<Brief> briefs = listByPromoId.get(promoId);
+        if(briefs == null) {
+            briefs = new ArrayList<>();
+        }
+        return briefs;
+    }
+
+    public Promotion getPromo() {
+        return Promotion.getById(promoId);
     }
 }

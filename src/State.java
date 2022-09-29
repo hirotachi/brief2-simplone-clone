@@ -12,6 +12,7 @@ public class State {
         User.parseAndLoad(new HashMap<>());
         Admin.parseAndLoad(new HashMap<>());
         Promotion.parseAndLoad(new HashMap<>());
+        Brief.parseAndLoad(new HashMap<>());
         readJSONState();
 
 
@@ -26,6 +27,7 @@ public class State {
         try {
             String text = Files.readString(Paths.get("test.json"));
 //            convert text to JSObject
+
 
 
         } catch (IOException e) {

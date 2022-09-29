@@ -14,6 +14,6 @@ public class Main {
         Commander commander = isAdmin ? Auth.getAdmin() : Auth.getUser();
 //         list all commands
 //         listen to command and run command accordingly
-        CMD.listAndListen(commander.getCommands());
+        CMD.listAndListen(Command.getCurrentUserCommands());
     }
 }
