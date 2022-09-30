@@ -1,4 +1,4 @@
-import services.EmainService;
+import services.EmailService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,7 +49,7 @@ public class Admin implements Commander {
             }));
 
             add(new Command("Send test email", () -> {
-                EmainService.send("saidoudouane@gmail.com", "test subject", "test description");
+                EmailService.send("saidoudouane@gmail.com", "test subject", "test description");
                 Logger.successln("Email sent successfully");
             }));
 

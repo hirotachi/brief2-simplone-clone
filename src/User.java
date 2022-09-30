@@ -1,4 +1,4 @@
-import services.EmainService;
+import services.EmailService;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -186,6 +186,6 @@ public class User extends Option implements Commander {
     public void notifyAboutBrief(Brief brief){
         String body = "A new brief (" + brief.getName() + ") has been published to your promotion. Login to the Simplon app to read it.";
         String subject = "Briefing";
-        EmainService.send(this.getEmail(), subject, body);
+        EmailService.send(this.getEmail(), subject, body);
     }
 }
