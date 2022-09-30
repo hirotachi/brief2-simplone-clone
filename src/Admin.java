@@ -1,5 +1,6 @@
+import services.EmainService;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 
 
@@ -45,6 +46,11 @@ public class Admin implements Commander {
             }));
             add(new Command("Assign Apprenant to promotion", () -> {
                 User.assignPromotion(Role.APPRENANT);
+            }));
+
+            add(new Command("Send test email", () -> {
+                EmainService.send("saidoudouane@gmail.com", "test subject", "test description");
+                Logger.successln("Email sent successfully");
             }));
 
         }};

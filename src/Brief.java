@@ -92,7 +92,7 @@ public class Brief extends Option {
 
         ArrayList<Option> options = new ArrayList<>(briefs);
         int option = CMD.chooseOption(options, true);
-        if(option == 0) {
+        if(option == -1) {
             Logger.warningln("Publishing cancelled");
             return;
         }
@@ -130,9 +130,9 @@ public class Brief extends Option {
     @Override
     public String toString() {
         if (isPublished()) {
-            Logger.error("(Draft)");
-        } else {
             Logger.success("(Published)");
+        } else {
+            Logger.error("(Draft)");
         }
         return " " + getName() + " - " + getDescription();
     }
@@ -143,6 +143,7 @@ public class Brief extends Option {
 
     public void setPublished(boolean published) {
         this.published = published;
+        if (published) this.getPromotion().notifyApprenants(this);
     }
 
 
@@ -176,14 +177,10 @@ public class Brief extends Option {
     }
 
     private static ArrayList<Brief> getByPromoId(int promoId) {
-        ArrayList<Brief> briefs = listByPromoId.get(promoId);
-        if(briefs == null) {
-            briefs = new ArrayList<>();
-        }
-        return briefs;
+        return listByPromoId.getOrDefault(promoId, new ArrayList<>());
     }
 
-    public Promotion getPromo() {
+    public Promotion getPromotion() {
         return Promotion.getById(promoId);
     }
 }

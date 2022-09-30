@@ -160,4 +160,10 @@ public class Promotion extends Option {
     public int getYear() {
         return year;
     }
+
+
+    public void notifyApprenants(Brief brief){
+        getApprenants().parallelStream().forEach(apprenant -> apprenant.notifyAboutBrief(brief));
+        Logger.successln("Promotion has been notified successfully");
+    }
 }

@@ -1,6 +1,7 @@
+import services.EmainService;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 
 public class User extends Option implements Commander {
@@ -180,5 +181,11 @@ public class User extends Option implements Commander {
 
     public void setLastBriefReadDate(LocalDateTime lastBriefReadDate) {
         this.lastBriefReadDate = lastBriefReadDate;
+    }
+
+    public void notifyAboutBrief(Brief brief){
+        String body = "A new brief (" + brief.getName() + ") has been published to your promotion. Login to the Simplon app to read it.";
+        String subject = "Briefing";
+        EmainService.send(this.getEmail(), subject, body);
     }
 }
