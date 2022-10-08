@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Objects;
 
-public class User extends TimestampedModel {
+public class User extends TimestampedModel implements Table {
     protected static final String tableName = "users";
     private static final String[] roles = new String[]{"formateur", "apprenant"};
     protected final String email;
@@ -75,7 +75,7 @@ public class User extends TimestampedModel {
         }
     }
 
-    public static User[] manyFromResultSet(ResultSet resultSet) {
+    public static User[] fromResultSetArray(ResultSet resultSet) {
         try {
             resultSet.beforeFirst();
             resultSet.last();

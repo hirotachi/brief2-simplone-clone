@@ -11,7 +11,6 @@ import java.util.Arrays;
 
 abstract public class Model extends Connection {
 
-    protected final String tableName = null;
 
     protected static Repository getRepository(String tableName) {
         return Repository.getRepository(tableName);

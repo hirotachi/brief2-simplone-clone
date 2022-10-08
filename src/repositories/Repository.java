@@ -78,4 +78,20 @@ public class Repository extends Connection {
             return null;
         }
     }
+
+    public ResultSet getAll() {
+        String query = "SELECT * FROM " + getTableName();
+        try {
+            PreparedStatement preparedStatement = Connection.getPreparedStatement(query);
+            assert preparedStatement != null;
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (!resultSet.next()) {
+                return null;
+            }
+            return resultSet;
+        } catch (SQLException e) {
+            System.out.println("Error while getting all from \"" + getTableName() + "\"");
+            return null;
+        }
+    }
 }
