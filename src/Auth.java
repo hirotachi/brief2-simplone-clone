@@ -1,4 +1,6 @@
-import java.util.ArrayList;
+import models.Admin;
+import models.Role;
+import models.User;
 
 public class Auth {
     private static User user;
@@ -9,7 +11,7 @@ public class Auth {
     public static void authenticate() {
         String username = CMD.getInput("Enter your email/Username: ").toLowerCase();
         String password = CMD.getHiddenInput("Enter your password: ");
-        admin = Admin.getAdminByUsername(username);
+        admin = Admin.getByUsername(username);
         if (admin != null && !admin.verifyPassword(password)) {
             authenticate(true);
             return;

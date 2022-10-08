@@ -8,7 +8,6 @@ import java.util.Objects;
 
 public class User extends TimestampedModel implements Table {
     protected static final String tableName = "users";
-    private static final String[] roles = new String[]{"formateur", "apprenant"};
     protected final String email;
     protected final int role;
     protected final String name;
@@ -106,8 +105,8 @@ public class User extends TimestampedModel implements Table {
         return email;
     }
 
-    public String getRole() {
-        return roles[role];
+    public Role getRole() {
+        return Role.values()[role];
     }
 
     public String getName() {

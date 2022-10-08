@@ -1,3 +1,5 @@
+import models.Role;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
@@ -9,7 +11,9 @@ public class Apprenant extends User {
 
     public static ArrayList<Command> getCommands() {
         User user = Auth.getUser();
-        if(user.getPromotion() == null) return new ArrayList<>();
+        if (user.getPromotion() == null) {
+            return new ArrayList<>();
+        }
         return new ArrayList<>() {{
             add(new Command("List Briefs", () -> {
                 user.setLastBriefReadDate(LocalDateTime.now());
@@ -36,7 +40,7 @@ public class Apprenant extends User {
     public static void list() {
         ArrayList<Option> apprenant = User.asOptions(Role.APPRENANT);
         int size = apprenant.size();
-        if(size == 0) {
+        if (size == 0) {
             Logger.warningln("No apprenants found");
             return;
         }
@@ -46,8 +50,8 @@ public class Apprenant extends User {
     }
 
     public static Apprenant add(String email, String name, String password) {
-        Apprenant apprenant = new Apprenant(email, getNextUserId(), password, name);
-        addUser(apprenant);
+        Apprenant apprenant = new Apprenant(email, User.getNextUserId(), password, name);
+        User.addUser(apprenant);
         return apprenant;
     }
 }

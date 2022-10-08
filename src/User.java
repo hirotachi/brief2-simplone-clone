@@ -1,3 +1,4 @@
+import models.Role;
 import services.EmailService;
 
 import java.time.LocalDateTime;

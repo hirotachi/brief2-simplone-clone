@@ -1,3 +1,4 @@
+import models.Role;
 import services.EmailService;
 
 import java.util.ArrayList;
@@ -24,15 +25,6 @@ public class Admin implements Commander {
         return adminsByUsername.get(username);
     }
 
-    public boolean verifyPassword(String password) {
-        return this.password.equals(password);
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-
     public static ArrayList<Command> getCommands() {
         return new ArrayList<>() {{
             add(new Command("Create formatteur", Formateur::create));
@@ -56,11 +48,6 @@ public class Admin implements Commander {
         }};
     }
 
-
-    public int getId() {
-        return id;
-    }
-
     public static void parseAndLoad(HashMap<String, Admin> adminsByUsername) {
         Admin.adminsByUsername = adminsByUsername;
     }
@@ -72,5 +59,17 @@ public class Admin implements Commander {
     public static void add(String username, String password) {
         Admin admin = new Admin(username, password, getNextAdminId());
         adminsByUsername.put(admin.getUsername(), admin);
+    }
+
+    public boolean verifyPassword(String password) {
+        return this.password.equals(password);
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public int getId() {
+        return id;
     }
 }

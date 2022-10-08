@@ -1,3 +1,5 @@
+import models.Role;
+
 import java.util.ArrayList;
 
 public class Formateur extends User {
@@ -7,7 +9,9 @@ public class Formateur extends User {
     }
 
     public static ArrayList<Command> getCommands() {
-        if(Auth.getUser().getPromotion() == null) return new ArrayList<>();
+        if (Auth.getUser().getPromotion() == null) {
+            return new ArrayList<>();
+        }
         return new ArrayList<>() {{
             add(new Command("Add brief", Brief::create));
             add(new Command("Publish a brief", Brief::publish));
@@ -49,8 +53,8 @@ public class Formateur extends User {
 
 
     public static Formateur add(String email, String name, String password) {
-        Formateur formateur = new Formateur(email, getNextUserId(), password, name);
-        addUser(formateur);
+        Formateur formateur = new Formateur(email, User.getNextUserId(), password, name);
+        User.addUser(formateur);
         return formateur;
     }
 
