@@ -27,14 +27,6 @@ public class User extends Option implements Commander {
         this.role = role;
     }
 
-    public static void parseAndLoad(HashMap<String, User> usersByEmail) {
-        User.usersByEmail = usersByEmail;
-        User.usersById = new HashMap<>();
-        for (User user : usersByEmail.values()) {
-            usersById.put(user.getId(), user);
-        }
-    }
-
     public static User getByEmail(String email) {
         return usersByEmail.get(email);
     }
@@ -75,84 +67,22 @@ public class User extends Option implements Commander {
         return new ArrayList<>(usersByEmail.values());
     }
 
-
-
-    public boolean verifyPassword(String password) {
-        return this.password.equals(password);
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
-    }
-
-
-    public int getPromoId() {
-        return promoId;
-    }
-
-    public void setPromoId(int promoId) {
-        this.promoId = promoId;
-    }
-
     public static ArrayList<Command> getCommands() {
         return new ArrayList<>();
     }
-
-
-    public void assignToPromo(Boolean showConfirmation) {
-
-    }
-
-    @Override
-    public String toString() {
-        return this.getName() + " - (" + this.getEmail() + ")" + (this.getPromotion() != null ? " - " + this.getPromotion().getName() : "");
-    }
-
 
     public static void assignPromotion(Role role) {
         int count = Promotion.count();
         if (count == 0) {
             Logger.errorln("No promotions found, one needs to be created first");
-            if(Auth.getAdmin() == null) return; // only admins can create promotions
+            if (Auth.getAdmin() == null) {
+                return; // only admins can create promotions
+            }
 
             boolean createPromotion = CMD.getConfirmation("Create a promotion?");
-            if (!createPromotion) return;
+            if (!createPromotion) {
+                return;
+            }
             Promotion.create();
         }
         ArrayList<Option> usersByRoleAsOptions = asOptions(role);
@@ -166,13 +96,76 @@ public class User extends Option implements Commander {
         Logger.successln("Promotion " + user.getPromotion().getName() + " assigned to " + user.getName());
     }
 
-    public Promotion getPromotion() {
-        if(this.getPromoId() == 0) return null;
-        return Promotion.getById(this.getPromoId());
-    }
-
     public static User getById(int id) {
         return usersById.get(id);
+    }
+
+    public boolean verifyPassword(String password) {
+        return this.password.equals(password);
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getPromoId() {
+        return promoId;
+    }
+
+    public void setPromoId(int promoId) {
+        this.promoId = promoId;
+    }
+
+    public void assignToPromo(Boolean showConfirmation) {
+
+    }
+
+    @Override
+    public String toString() {
+        return getName() + " - (" + getEmail() + ")" + (getPromotion() != null ? " - " + getPromotion().getName() : "");
+    }
+
+    public Promotion getPromotion() {
+        if (getPromoId() == 0) {
+            return null;
+        }
+        return Promotion.getById(getPromoId());
     }
 
     public LocalDateTime getLastBriefReadDate() {
@@ -183,9 +176,9 @@ public class User extends Option implements Commander {
         this.lastBriefReadDate = lastBriefReadDate;
     }
 
-    public void notifyAboutBrief(Brief brief){
+    public void notifyAboutBrief(Brief brief) {
         String body = "A new brief (" + brief.getName() + ") has been published to your promotion. Login to the Simplon app to read it.";
         String subject = "Briefing";
-        EmailService.send(this.getEmail(), subject, body);
+        EmailService.send(getEmail(), subject, body);
     }
 }
