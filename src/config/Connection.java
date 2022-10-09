@@ -1,6 +1,7 @@
 package config;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Objects;
 
@@ -28,7 +29,8 @@ abstract public class Connection {
 
 
     protected static PreparedStatement getPreparedStatement(String query) throws SQLException {
-        return Objects.requireNonNull(getConnection()).prepareStatement(query);
+        return Objects.requireNonNull(getConnection())
+                      .prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
     }
 
 }

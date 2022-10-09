@@ -4,7 +4,6 @@ import models.Option;
 import models.Role;
 import models.User;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class ApprenantService extends MemberService {
@@ -16,11 +15,8 @@ public class ApprenantService extends MemberService {
             return new ArrayList<>();
         }
         return new ArrayList<>() {{
-            add(new Command("List Briefs", () -> {
-                user.setLastBriefReadDate(String.valueOf(LocalDateTime.now()));
-                user.save();
-                BriefService.listAssigned();
-            }));
+            add(new Command("List Briefs", BriefService::listAssigned));
+            add(new Command("My promotion", MemberService::showAssignedPromotion));
         }};
     }
 
@@ -56,6 +52,10 @@ public class ApprenantService extends MemberService {
     }
 
     public static ArrayList<Option> asOptions() {
+        if (AuthService.getLoggedInRole() == Role.FORMATTEUR) {
+            return MemberService.asOptions(Role.APPRENANT, AuthService.getUser().getPromo());
+        }
         return MemberService.asOptions(Role.APPRENANT);
     }
+
 }

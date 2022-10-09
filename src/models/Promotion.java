@@ -1,11 +1,9 @@
 package models;
 
-import org.jetbrains.annotations.NotNull;
 import repositories.Repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Objects;
 
 //create table if not exists promos (
 //        id serial primary key,
@@ -15,12 +13,11 @@ import java.util.Objects;
 //        deleted_at timestamp,
 //        year int not null default 2020
 //        );
-public class Promotion extends TimestampedModel implements Table, Option {
-    protected static final String tableName = "promos";
-
-    protected final int id;
-    protected final String name;
-    protected final int year;
+@TableTest(tableName = "promos")
+public class Promotion extends TimestampedModel implements Option {
+    protected int id;
+    protected String name;
+    protected int year;
 
     public Promotion(int id, String name, int year, String updated_at, String created_at, String deleted_at) {
         super(updated_at, created_at, deleted_at);
@@ -41,24 +38,28 @@ public class Promotion extends TimestampedModel implements Table, Option {
     }
 
     public static Promotion getById(int id) {
-        return fromResultSet(Objects.requireNonNull(Model.getRepository(tableName).getByIntFields(
+        return fromResultSet(getRepository().getByIntFields(
                 new String[]{"id"},
                 new int[]{id}
-        )));
+        ));
+    }
+
+    private static Repository getRepository() {
+        return Model.getRepository(new Promotion());
     }
 
     public static Promotion getByName(String name) {
-        return fromResultSet(Objects.requireNonNull(Model.getRepository(tableName).getByStringFields(
+        return fromResultSet(getRepository().getByStringFields(
                 new String[]{"name"},
                 new String[]{name}
-        )));
+        ));
     }
 
     public static Promotion getByYear(int year) {
-        return fromResultSet(Objects.requireNonNull(getRepository().getByIntFields(
+        return fromResultSet(getRepository().getByIntFields(
                 new String[]{"year"},
                 new int[]{year}
-        )));
+        ));
     }
 
     public static Promotion[] getAll() {
@@ -66,6 +67,9 @@ public class Promotion extends TimestampedModel implements Table, Option {
     }
 
     public static Promotion fromResultSet(ResultSet resultSet) {
+        if (resultSet == null) {
+            return null;
+        }
         try {
             return new Promotion(
                     resultSet.getInt("id"),
@@ -77,7 +81,6 @@ public class Promotion extends TimestampedModel implements Table, Option {
             );
         } catch (SQLException e) {
             e.printStackTrace();
-
             return null;
         }
     }
@@ -85,32 +88,26 @@ public class Promotion extends TimestampedModel implements Table, Option {
     public static Promotion[] fromResultSetArray(ResultSet resultSet) {
         try {
             if (resultSet == null) {
-                return null;
+                return new Promotion[0];
             }
-            resultSet.last();
-            int size = resultSet.getRow();
-            resultSet.beforeFirst();
+            int size = getSize(resultSet);
             Promotion[] promotions = new Promotion[size];
-            int i = 0;
-            while (resultSet.next()) {
-                promotions[i++] = fromResultSet(resultSet);
+            for (int i = 0; i < size; i++) {
+                resultSet.next();
+                promotions[i] = fromResultSet(resultSet);
             }
             return promotions;
         } catch (SQLException e) {
             e.printStackTrace();
-            return null;
+            return new Promotion[0];
         }
     }
 
 
-    @NotNull
-    private static Repository getRepository() {
-        return Model.getRepository(tableName);
-    }
-
     public static int count() {
         return getRepository().count();
     }
+
 
     public String getName() {
         return name;
@@ -124,4 +121,5 @@ public class Promotion extends TimestampedModel implements Table, Option {
     public String toString() {
         return getName();
     }
+
 }

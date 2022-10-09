@@ -87,7 +87,12 @@ public class CMD {
     public static String getInput(String message) {
         Logger.logln(message);
         Scanner scanner = new Scanner(System.in);
-        return scanner.nextLine().trim();
+        String trim = scanner.nextLine().trim();
+        if (trim.isEmpty()) {
+            Logger.errorln("Input cannot be empty");
+            return getInput(message);
+        }
+        return trim;
     }
 
     public static boolean getConfirmation(String message) {

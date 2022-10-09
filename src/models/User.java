@@ -1,11 +1,12 @@
 package models;
 
 import config.Util;
+import repositories.Repository;
 import services.EmailService;
+import services.Logger;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Objects;
 
 
 //create table if not exists users
@@ -21,12 +22,12 @@ import java.util.Objects;
 //        deleted_at           timestamp,
 //        last_brief_read_date timestamp
 //        );
-public class User extends TimestampedModel implements Table, Option {
-    protected static final String tableName = "users";
-    protected final String email;
-    protected final int role;
-    protected final String name;
-    protected final int id;
+@TableTest(tableName = "users")
+public class User extends TimestampedModel implements Option {
+    protected String email;
+    protected int role;
+    protected String name;
+    protected int id;
     protected String password;
     protected int promo_id;
     protected String last_brief_read_date;
@@ -54,32 +55,44 @@ public class User extends TimestampedModel implements Table, Option {
         id = -1;
         promo_id = -1;
         last_brief_read_date = null;
+
     }
 
     public User(String email, String password, String name, int role) {
         this(email, name, password, role, -1, -1, null, null, null, null);
+
     }
 
     public static User getByEmail(String email) {
-        return (User) Model.getRepository(tableName).getByStringFields(new String[]{"email"}, new String[]{email});
+        return fromResultSet(getRepository().getByStringFields(
+                new String[]{"email"},
+                new String[]{email}
+        ));
     }
 
     public static User getById(int id) {
-        ResultSet resultSet = Model.getRepository(tableName).getByIntFields(new String[]{"id"}, new int[]{id});
-        if (resultSet == null) {
-            return null;
-        }
-        return fromResultSet(resultSet);
+        return fromResultSet(getRepository().getByIntFields(
+                new String[]{"id"},
+                new int[]{id}
+        ));
     }
 
+    private static Repository getRepository() {
+        return Model.getRepository(new User());
+    }
+
+
     public static User getByRole(int role) {
-        return fromResultSet(Objects.requireNonNull(Model.getRepository(tableName).getByIntFields(
+        return fromResultSet(getRepository().getByIntFields(
                 new String[]{"role"},
                 new int[]{role}
-        )));
+        ));
     }
 
     public static User fromResultSet(ResultSet resultSet) {
+        if (resultSet == null) {
+            return null;
+        }
         try {
             return new User(
                     resultSet.getString("email"),
@@ -101,10 +114,10 @@ public class User extends TimestampedModel implements Table, Option {
 
     public static User[] fromResultSetArray(ResultSet resultSet) {
         try {
-            resultSet.beforeFirst();
-            resultSet.last();
-            int size = resultSet.getRow();
-            resultSet.beforeFirst();
+            if (resultSet == null) {
+                return new User[0];
+            }
+            int size = getSize(resultSet);
             User[] users = new User[size];
             for (int i = 0; i < size; i++) {
                 resultSet.next();
@@ -113,34 +126,35 @@ public class User extends TimestampedModel implements Table, Option {
             return users;
         } catch (SQLException e) {
             System.out.println(e.getMessage());
-            return null;
+            return new User[0];
         }
     }
 
     public static User[] getAll() {
-        return fromResultSetArray(Objects.requireNonNull(Model.getRepository(tableName).getAll()));
+        return fromResultSetArray(getRepository().getAll());
     }
 
-    public static User[] getByAllByRole(int role) {
-        return fromResultSetArray(Objects.requireNonNull(Model.getRepository(tableName).getByIntFields(
+    public static User[] getAllByRole(int role) {
+        return fromResultSetArray(getRepository().getByIntFields(
                 new String[]{"role"},
                 new int[]{role}
-        )));
+        ));
     }
 
     public static User[] getAllByPromoId(int promoId) {
-        return fromResultSetArray(Objects.requireNonNull(Model.getRepository(tableName).getByIntFields(
+        return fromResultSetArray(getRepository().getByIntFields(
                 new String[]{"promo_id"},
                 new int[]{promoId}
-        )));
+        ));
     }
 
     public static User[] getAllByPromoIdAndRole(int promo_id, int role) {
-        return fromResultSetArray(Objects.requireNonNull(Model.getRepository(tableName).getByIntFields(
+        return fromResultSetArray(getRepository().getByIntFields(
                 new String[]{"promo_id", "role"},
                 new int[]{promo_id, role}
-        )));
+        ));
     }
+
 
     @Override
     protected User parseResultSet(ResultSet resultSet) {
@@ -180,9 +194,6 @@ public class User extends TimestampedModel implements Table, Option {
         promo_id = promoId;
     }
 
-    public void setLastBriefReadDate(String last_brief_read_date) {
-        this.last_brief_read_date = last_brief_read_date;
-    }
 
     public Promotion getPromotion() {
         if (promo_id == -1) {
@@ -195,6 +206,7 @@ public class User extends TimestampedModel implements Table, Option {
         String body = "A new brief (" + brief.getName() + ") has been published to your promotion. Login to the Simplon app to read it.";
         String subject = "Briefing";
         EmailService.send(getEmail(), subject, body);
+        Logger.infoln("Sent email to " + getEmail() + " about brief " + brief.getName());
     }
 
     @Override

@@ -30,9 +30,11 @@ public class BriefService {
 
         if (!hidePublishConfirmation) {
             boolean publish = CMD.getConfirmation("Do you want to publish the brief ?");
-            brief.publish(publish);
+            if (publish) {
+                brief.publish(true);
+            }
         }
-        Logger.successln("services.Brief created successfully");
+        Logger.successln("Brief created successfully");
     }
 
     public static void publish() {
@@ -56,7 +58,7 @@ public class BriefService {
         }
         Brief brief = briefs[option];
         brief.publish(true);
-        Logger.successln("services.Brief" + brief.getName() + "published successfully");
+        Logger.successln("Brief " + brief.getName() + "published successfully");
     }
 
 
@@ -75,6 +77,17 @@ public class BriefService {
 
     public static ArrayList<Option> asOptions(int promoId) {
         return asOptions(Brief.getAllByPromoId(promoId));
+    }
+
+    public static ArrayList<Option> asOptions(int promoId, boolean published) {
+        Brief[] briefs = Brief.getAllByPromoId(promoId);
+        ArrayList<Option> options = new ArrayList<>();
+        for (Brief brief : briefs) {
+            if (brief.isPublished() == published) {
+                options.add(brief);
+            }
+        }
+        return options;
     }
 
     public static void list() {

@@ -19,13 +19,17 @@ public class MemberService implements Commander, Option {
 
 
     public static ArrayList<Option> asOptions(Role role) {
-        return asOptions(User.getByAllByRole(role.ordinal()));
+        return asOptions(User.getAllByRole(role.ordinal()));
     }
 
     public static ArrayList<Option> asOptions(User[] users) {
         ArrayList<Option> options = new ArrayList<>();
         Collections.addAll(options, users);
         return options;
+    }
+
+    public static ArrayList<Option> asOptions(Role role, int promoId) {
+        return asOptions(User.getAllByPromoIdAndRole(promoId, role.ordinal()));
     }
 
 
@@ -52,6 +56,10 @@ public class MemberService implements Commander, Option {
         User user = (User) usersByRoleAsOptions.get(option);
         PromotionService.assignPromotion(user, false);
         Logger.successln("Promotion " + user.getPromotion().getName() + " assigned to " + user.getName());
+    }
+
+    public static void showAssignedPromotion() {
+        Logger.infoln("Assigned promotion: " + AuthService.getUser().getPromotion().getName());
     }
 
 

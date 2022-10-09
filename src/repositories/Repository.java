@@ -53,6 +53,8 @@ public class Repository extends Connection {
                 query.append(" AND ");
             }
         }
+//         order by id desc
+        query.append(" order by id desc");
         return query.toString();
     }
 

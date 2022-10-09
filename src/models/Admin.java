@@ -1,22 +1,20 @@
 package models;
 
 import config.Util;
-import org.jetbrains.annotations.NotNull;
 import repositories.Repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Objects;
 
 //create table if not exists admins(
 //        id serial primary key,
 //        username varchar(255) not null unique,
 //        password varchar(255) not null
 //        );
-public class Admin extends Model implements Table {
-    protected static final String tableName = "admins";
-    protected final int id;
-    protected final String username;
+@TableTest(tableName = "admins")
+public class Admin extends Model {
+    protected int id;
+    protected String username;
     protected String password;
 
     public Admin(int id, String username, String password) {
@@ -36,13 +34,20 @@ public class Admin extends Model implements Table {
     }
 
     public static Admin getByUsername(String username) {
-        return fromResultSet(Objects.requireNonNull(Model.getRepository(tableName).getByStringFields(
+        return fromResultSet(getRepository().getByStringFields(
                 new String[]{"username"},
                 new String[]{username}
-        )));
+        ));
+    }
+
+    private static Repository getRepository() {
+        return Model.getRepository(new Admin());
     }
 
     private static Admin fromResultSet(ResultSet resultSet) {
+        if (resultSet == null) {
+            return null;
+        }
         try {
             return new Admin(
                     resultSet.getInt("id"),
@@ -59,33 +64,25 @@ public class Admin extends Model implements Table {
         return fromResultSetArray(getRepository().getAll());
     }
 
-    private static @NotNull Repository getRepository() {
-        return Model.getRepository(tableName);
-    }
 
     private static Admin[] fromResultSetArray(ResultSet resultSet) {
         try {
             if (resultSet == null) {
-                return null;
+                return new Admin[0];
             }
-            resultSet.last();
-            int size = resultSet.getRow();
-            resultSet.beforeFirst();
+            int size = getSize(resultSet);
             Admin[] admins = new Admin[size];
-            int i = 0;
-            while (resultSet.next()) {
-                admins[i++] = new Admin(
-                        resultSet.getInt("id"),
-                        resultSet.getString("username"),
-                        resultSet.getString("password")
-                );
+            for (int i = 0; i < size; i++) {
+                resultSet.next();
+                admins[i] = fromResultSet(resultSet);
             }
             return admins;
         } catch (SQLException e) {
             e.printStackTrace();
-            return null;
+            return new Admin[0];
         }
     }
+
 
     public boolean verifyPassword(String password) {
         return this.password.equals(password);

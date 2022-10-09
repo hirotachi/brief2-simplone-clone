@@ -17,6 +17,8 @@ public class FormateurService extends MemberService {
             add(new Command("Add brief", BriefService::create));
             add(new Command("Publish a brief", BriefService::publish));
             add(new Command("List briefs", BriefService::list));
+            add(new Command("List Promotions Apprenants", ApprenantService::list));
+            add(new Command("My promotion", MemberService::showAssignedPromotion));
             add(new Command("Assign Apprenant to Promotion", () -> MemberService.assignPromotion(Role.APPRENANT)));
         }};
     }

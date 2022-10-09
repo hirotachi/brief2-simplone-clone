@@ -32,7 +32,6 @@ public class PromotionService implements Option {
     public static void assignPromotion(User user, boolean askConfirmation) {
         Promotion[] promotions = Promotion.getAll();
         if (promotions.length == 0 && askConfirmation) {
-            Logger.errorln("No promotion found");
             return;
         }
 
@@ -85,7 +84,7 @@ public class PromotionService implements Option {
 
 
     public static void assignFormatteur(Promotion promotion, boolean askConfirmation) {
-        User[] users = User.getByAllByRole(Role.FORMATTEUR.ordinal());
+        User[] users = User.getAllByRole(Role.FORMATTEUR.ordinal());
         if (users.length == 0) {
             Logger.errorln("No formatteurs found");
             return;
@@ -97,19 +96,20 @@ public class PromotionService implements Option {
             }
         }
 
-        ArrayList<Option> options = asOptions();
+        ArrayList<Option> options = MemberService.asOptions(users);
         int option = CMD.chooseOption(options, true);
         if (option == -1) {
             return;
         }
         User user = (User) options.get(option);
         user.setPromo(promotion.getId());
+        user.save();
         Logger.successln("Formatteur " + user.getName() + " assigned to " + user.getName());
     }
 
 
     public static void notifyPromotion(Brief brief, int promo_id) {
-        User[] users = User.getAllByPromoIdAndRole(promo_id, Role.FORMATTEUR.ordinal());
+        User[] users = User.getAllByPromoIdAndRole(promo_id, Role.APPRENANT.ordinal());
         if (users.length == 0) {
             Logger.warningln("No apprenants found in this promotion");
             return;

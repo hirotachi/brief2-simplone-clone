@@ -1,6 +1,5 @@
 package models;
 
-import org.jetbrains.annotations.NotNull;
 import repositories.Repository;
 import services.Logger;
 import services.PromotionService;
@@ -20,14 +19,14 @@ import java.util.Objects;
 //        user_id int references users(id),
 //        promo_id int references promos(id)
 //        );
-public class Brief extends TimestampedModel implements Table, Option {
-    protected static final String tableName = "briefs";
+@TableTest(tableName = "briefs")
+public class Brief extends TimestampedModel implements Option {
 
-    protected final int id;
-    protected final String name;
-    protected final String description;
-    protected final int user_id;
-    protected final int promo_id;
+    protected int id;
+    protected String name;
+    protected String description;
+    protected int user_id;
+    protected int promo_id;
     protected String published_at;
 
     public Brief(int id, String name, String description, int user_id, int promo_id, String updated_at, String created_at, String deleted_at, String published_at) {
@@ -55,7 +54,7 @@ public class Brief extends TimestampedModel implements Table, Option {
     }
 
     public static Brief getById(int id) {
-        return fromResultSet(Objects.requireNonNull(Model.getRepository(tableName).getByIntFields(
+        return fromResultSet(Objects.requireNonNull(getRepository().getByIntFields(
                 new String[]{"id"},
                 new int[]{id}
         )));
@@ -79,7 +78,14 @@ public class Brief extends TimestampedModel implements Table, Option {
         ));
     }
 
+    private static Repository getRepository() {
+        return Model.getRepository(new Brief());
+    }
+
     private static Brief fromResultSet(ResultSet resultSet) {
+        if (resultSet == null) {
+            return null;
+        }
         try {
             return new Brief(
                     resultSet.getInt("id"),
@@ -100,9 +106,10 @@ public class Brief extends TimestampedModel implements Table, Option {
 
     private static Brief[] fromResultSetArray(ResultSet resultSet) {
         try {
-            resultSet.last();
-            int size = resultSet.getRow();
-            resultSet.beforeFirst();
+            if (resultSet == null) {
+                return new Brief[0];
+            }
+            int size = getSize(resultSet);
             Brief[] briefs = new Brief[size];
             for (int i = 0; i < size; i++) {
                 resultSet.next();
@@ -111,13 +118,10 @@ public class Brief extends TimestampedModel implements Table, Option {
             return briefs;
         } catch (SQLException e) {
             e.printStackTrace();
-            return null;
+            return new Brief[0];
         }
     }
 
-    private static @NotNull Repository getRepository() {
-        return Model.getRepository(tableName);
-    }
 
     public int getId() {
         return id;
@@ -148,11 +152,15 @@ public class Brief extends TimestampedModel implements Table, Option {
 
     @Override
     public String toString() {
-        if (published_at != null) {
-            Logger.success("(Published)");
+        if (isPublished()) {
+            Logger.success("(Published) ");
         } else {
-            Logger.error("(Draft)");
+            Logger.error("(Draft) ");
         }
         return " " + getName() + " - " + getDescription();
+    }
+
+    public boolean isPublished() {
+        return published_at != null;
     }
 }
