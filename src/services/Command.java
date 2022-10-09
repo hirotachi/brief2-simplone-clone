@@ -15,9 +15,9 @@ public class Command {
 
     public static ArrayList<Command> getCurrentUserCommands() {
         return switch (AuthService.getLoggedInRole()) {
-            case Role.FORMATTEUR -> FormateurService.getCommands();
-            case Role.APPRENANT -> ApprenantService.getCommands();
-            case Role.ADMIN -> AdminService.getCommands();
+            case FORMATTEUR -> FormateurService.getCommands();
+            case APPRENANT -> ApprenantService.getCommands();
+            case ADMIN -> AdminService.getCommands();
         };
     }
 

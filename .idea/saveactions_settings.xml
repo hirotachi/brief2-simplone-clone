@@ -9,7 +9,6 @@
         <option value="rearrange" />
         <option value="unqualifiedFieldAccess" />
         <option value="unqualifiedMethodAccess" />
-        <option value="customUnqualifiedStaticMemberAccess" />
         <option value="missingOverrideAnnotation" />
         <option value="useBlocks" />
         <option value="unnecessaryThis" />
