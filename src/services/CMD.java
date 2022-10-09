@@ -1,3 +1,7 @@
+package services;
+
+import models.Option;
+
 import java.io.Console;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
@@ -32,7 +36,7 @@ public class CMD {
         Scanner scanner = new Scanner(System.in);
         Logger.log("Enter a command number: ");
 
-        int commandIndex = 0;
+        int commandIndex;
         try {
             commandIndex = scanner.nextInt();
         } catch (InputMismatchException e) {
@@ -50,8 +54,8 @@ public class CMD {
                 return;
             }
             case -2 -> {
-                Auth.logout();
-                Main.start(); // Restart the program
+                AuthService.logout();
+                Application.start(); // Restart the program
                 return;
             }
             case -3 -> {

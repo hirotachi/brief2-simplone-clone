@@ -31,6 +31,10 @@ public class Admin extends Model implements Table {
         password = null;
     }
 
+    public Admin(String username, String password) {
+        this(-1, username, password);
+    }
+
     public static Admin getByUsername(String username) {
         return fromResultSet(Objects.requireNonNull(Model.getRepository(tableName).getByStringFields(
                 new String[]{"username"},
@@ -90,5 +94,9 @@ public class Admin extends Model implements Table {
     @Override
     public void beforeSave() {
         password = Util.hashString(password);
+    }
+
+    public String getUsername() {
+        return username;
     }
 }

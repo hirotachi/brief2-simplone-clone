@@ -15,7 +15,7 @@ import java.util.Objects;
 //        deleted_at timestamp,
 //        year int not null default 2020
 //        );
-public class Promotion extends TimestampedModel implements Table {
+public class Promotion extends TimestampedModel implements Table, Option {
     protected static final String tableName = "promos";
 
     protected final int id;
@@ -34,6 +34,10 @@ public class Promotion extends TimestampedModel implements Table {
         id = -1;
         name = null;
         year = -1;
+    }
+
+    public Promotion(String name, int year) {
+        this(-1, name, year, null, null, null);
     }
 
     public static Promotion getById(int id) {
@@ -102,5 +106,22 @@ public class Promotion extends TimestampedModel implements Table {
     @NotNull
     private static Repository getRepository() {
         return Model.getRepository(tableName);
+    }
+
+    public static int count() {
+        return getRepository().count();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    @Override
+    public String toString() {
+        return getName();
     }
 }

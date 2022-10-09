@@ -6,6 +6,7 @@ import repositories.Repository;
 
 import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 
@@ -24,22 +25,33 @@ abstract public class Model extends Connection {
         return null;
     }
 
-    public boolean update() {
-//         get all properties from class definition
-        beforeUpdate();
-        String[] fields = getFields();
-        StringBuilder query = new StringBuilder("UPDATE " + getTableName() + " SET ");
-        for (String field : fields) {
-            query.append(field).append(" = ?, ");
-        }
-        if (isTimestamped()) {
-            query.append("updated_at = now(), ");
-        }
-        // remove last comma
-        query = new StringBuilder(query.substring(0, query.length() - 2));
-        String primaryKey = getPrimaryKey();
-        query.append(" WHERE ").append(primaryKey).append(" = ?");
+    public boolean save() {
+
         try {
+            String primaryKey = getPrimaryKey();
+            Object primaryKeyValue = getClass().getDeclaredField(primaryKey).get(this);
+            boolean isInsert = primaryKeyValue.equals(-1);
+            if (isInsert) {
+                beforeSave();
+            } else {
+                beforeUpdate();
+            }
+
+            String[] fields = getFields();
+            String operation = isInsert ? "insert into " : "update ";
+            StringBuilder query = new StringBuilder(operation + getTableName() + (isInsert
+                    ? " ("
+                    : " set "));
+            for (String field : fields) {
+                query.append(field).append(" = ?, ");
+            }
+            if (isTimestamped()) {
+                query.append("updated_at = now(), ");
+            }
+            // remove last comma
+            query = new StringBuilder(query.substring(0, query.length() - 2));
+            query.append(" WHERE ").append(primaryKey).append(" = ?");
+
             PreparedStatement preparedStatement = Connection.getPreparedStatement(query.toString());
             for (int i = 0; i < fields.length; i++) {
                 assert preparedStatement != null;
@@ -47,50 +59,17 @@ abstract public class Model extends Connection {
             }
             assert preparedStatement != null;
 //            get type of primary key and add it to the query
-            preparedStatement.setObject(fields.length + 1, getClass().getDeclaredField(primaryKey).get(this));
+            preparedStatement.setObject(fields.length + 1, primaryKeyValue);
             preparedStatement.executeUpdate();
+            refresh();
             return true;
         } catch (SQLException | IllegalAccessException | NoSuchFieldException e) {
-            System.out.println("Error while updating entity");
+            System.out.println("Error while saving entity" + e.getMessage());
             e.printStackTrace();
             return false;
         }
     }
 
-    public boolean save() {
-        beforeSave();
-        @NotNull String[] fields = getFields();
-
-        StringBuilder query = new StringBuilder("INSERT INTO " + getTableName() + " (");
-        for (int i = 0; i < fields.length; i++) {
-            query.append(fields[i]);
-            if (i != fields.length - 1) {
-                query.append(", ");
-            }
-        }
-        query.append(") VALUES (");
-        for (int i = 0; i < fields.length; i++) {
-            query.append("?");
-            if (i != fields.length - 1) {
-                query.append(", ");
-            }
-        }
-        query.append(")");
-        try {
-            PreparedStatement preparedStatement = Connection.getPreparedStatement(query.toString());
-            for (int i = 0; i < fields.length; i++) {
-                assert preparedStatement != null;
-                preparedStatement.setObject(i + 1, (String) getClass().getDeclaredField(fields[i]).get(this));
-            }
-            assert preparedStatement != null;
-            preparedStatement.executeUpdate();
-            return true;
-        } catch (SQLException | IllegalAccessException | NoSuchFieldException e) {
-            System.out.println("Error while saving entity: " + e.getMessage());
-            e.printStackTrace();
-            return false;
-        }
-    }
 
     public boolean softDelete() {
         String primaryKey = getPrimaryKey();
@@ -107,6 +86,31 @@ abstract public class Model extends Connection {
             return false;
         }
     }
+
+    public void refresh() {
+        String primaryKey = getPrimaryKey();
+        String query = "SELECT * FROM " + getTableName() + " WHERE " + primaryKey + " = ?";
+        try {
+            PreparedStatement preparedStatement = Connection.getPreparedStatement(query);
+            assert preparedStatement != null;
+            preparedStatement.setObject(1, getClass().getDeclaredField(primaryKey).get(this));
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                for (String field : getFields()) {
+                    getClass().getDeclaredField(field).set(this, resultSet.getObject(field));
+                }
+            }
+
+        } catch (SQLException | IllegalAccessException | NoSuchFieldException e) {
+            System.out.println("Error while fetching entity by primary key");
+            e.printStackTrace();
+        }
+    }
+
+    protected Model parseResultSet(ResultSet resultSet) {
+        return null;
+    }
+
 
     @NotNull
     protected String[] getFields() {

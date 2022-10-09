@@ -1,3 +1,5 @@
+package services;
+
 import java.util.ArrayList;
 
 public class Command {
@@ -11,6 +13,13 @@ public class Command {
         this.action = action;
     }
 
+    public static ArrayList<Command> getCurrentUserCommands() {
+        return switch (AuthService.getLoggedInRole()) {
+            case Role.FORMATTEUR -> FormateurService.getCommands();
+            case Role.APPRENANT -> ApprenantService.getCommands();
+            case Role.ADMIN -> AdminService.getCommands();
+        };
+    }
 
     public String getDescription() {
         return description;
@@ -18,14 +27,5 @@ public class Command {
 
     public void run() {
         action.run();
-    }
-
-
-    public static ArrayList<Command> getCurrentUserCommands(){
-        return switch (Auth.getLoggedInRole()) {
-            case FORMATTEUR -> Formateur.getCommands();
-            case APPRENANT -> Apprenant.getCommands();
-            case ADMIN -> Admin.getCommands();
-        };
     }
 }

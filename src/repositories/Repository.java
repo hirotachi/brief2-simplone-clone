@@ -94,4 +94,20 @@ public class Repository extends Connection {
             return null;
         }
     }
+
+    public int count() {
+        String query = "SELECT COUNT(*) FROM " + getTableName();
+        try {
+            PreparedStatement preparedStatement = Connection.getPreparedStatement(query);
+            assert preparedStatement != null;
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (!resultSet.next()) {
+                return 0;
+            }
+            return resultSet.getInt(1);
+        } catch (SQLException e) {
+            System.out.println("Error while counting from \"" + getTableName() + "\"");
+            return 0;
+        }
+    }
 }

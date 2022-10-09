@@ -1,24 +1,23 @@
+package services;
+
+import models.Option;
 import models.Role;
+import models.User;
 
 import java.util.ArrayList;
 
-public class Formateur extends User {
+public class FormateurService extends MemberService {
 
-    public Formateur(String email, int id, String password, String name) {
-        super(email, id, password, name, Role.FORMATTEUR);
-    }
 
     public static ArrayList<Command> getCommands() {
-        if (Auth.getUser().getPromotion() == null) {
+        if (AuthService.getUser().getPromotion() == null) {
             return new ArrayList<>();
         }
         return new ArrayList<>() {{
-            add(new Command("Add brief", Brief::create));
-            add(new Command("Publish a brief", Brief::publish));
-            add(new Command("List briefs", Brief::list));
-            add(new Command("Assign Apprenant to Promotion", () -> {
-                User.assignPromotion(Role.APPRENANT);
-            }));
+            add(new Command("Add brief", BriefService::create));
+            add(new Command("Publish a brief", BriefService::publish));
+            add(new Command("List briefs", BriefService::list));
+            add(new Command("Assign Apprenant to Promotion", () -> MemberService.assignPromotion(Role.APPRENANT)));
         }};
     }
 
@@ -33,9 +32,9 @@ public class Formateur extends User {
         }
         String name = CMD.getInput("Enter formatteur name:");
         String password = CMD.getHiddenInput("Enter formatteur password:");
-        Formateur formateur = add(email, name, password);
-        Promotion.assignPromotion(formateur, true);
-        Logger.successln("Formatteur (" + formateur.getName() + ") created successfully");
+        User user = add(email, name, password);
+        PromotionService.assignPromotion(user, true);
+        Logger.successln("Formatteur (" + user.getName() + ") created successfully");
     }
 
     public static void list() {
@@ -52,13 +51,11 @@ public class Formateur extends User {
     }
 
 
-    public static Formateur add(String email, String name, String password) {
-        Formateur formateur = new Formateur(email, User.getNextUserId(), password, name);
-        User.addUser(formateur);
-        return formateur;
+    public static User add(String email, String name, String password) {
+        return MemberService.addMember(email, password, name, Role.FORMATTEUR);
     }
 
     private static ArrayList<Option> asOptions() {
-        return User.asOptions(Role.FORMATTEUR);
+        return MemberService.asOptions(Role.FORMATTEUR);
     }
 }

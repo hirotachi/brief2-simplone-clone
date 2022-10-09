@@ -1,3 +1,5 @@
+package services;
+
 public class Logger {
 
     public static void successln(String message) {

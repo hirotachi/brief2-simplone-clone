@@ -2,6 +2,8 @@ package models;
 
 import org.jetbrains.annotations.NotNull;
 import repositories.Repository;
+import services.Logger;
+import services.PromotionService;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,7 +20,7 @@ import java.util.Objects;
 //        user_id int references users(id),
 //        promo_id int references promos(id)
 //        );
-public class Brief extends TimestampedModel implements Table {
+public class Brief extends TimestampedModel implements Table, Option {
     protected static final String tableName = "briefs";
 
     protected final int id;
@@ -26,7 +28,7 @@ public class Brief extends TimestampedModel implements Table {
     protected final String description;
     protected final int user_id;
     protected final int promo_id;
-    protected final String published_at;
+    protected String published_at;
 
     public Brief(int id, String name, String description, int user_id, int promo_id, String updated_at, String created_at, String deleted_at, String published_at) {
         super(updated_at, created_at, deleted_at);
@@ -46,6 +48,10 @@ public class Brief extends TimestampedModel implements Table {
         user_id = -1;
         promo_id = -1;
         published_at = null;
+    }
+
+    public Brief(String name, String description, int userId, int promoId) {
+        this(-1, name, description, userId, promoId, null, null, null, null);
     }
 
     public static Brief getById(int id) {
@@ -133,18 +139,20 @@ public class Brief extends TimestampedModel implements Table {
         return Promotion.getById(promo_id);
     }
 
+
+    public void publish(boolean publish) {
+        published_at = publish ? "now()" : null;
+        save();
+        PromotionService.notifyPromotion(this, promo_id);
+    }
+
     @Override
     public String toString() {
-        return "Brief{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", user_id=" + user_id +
-                ", promo_id=" + promo_id +
-                ", updated_at='" + updated_at + '\'' +
-                ", created_at='" + created_at + '\'' +
-                ", deleted_at='" + deleted_at + '\'' +
-                ", published_at='" + published_at + '\'' +
-                '}';
+        if (published_at != null) {
+            Logger.success("(Published)");
+        } else {
+            Logger.error("(Draft)");
+        }
+        return " " + getName() + " - " + getDescription();
     }
 }

@@ -1,8 +1,10 @@
+package services;
+
 import models.Admin;
 import models.Role;
 import models.User;
 
-public class Auth {
+public class AuthService {
     private static User user;
     private static Admin admin;
 
@@ -56,7 +58,7 @@ public class Auth {
     }
 
     public static void setUser(User user) {
-        Auth.user = user;
+        AuthService.user = user;
     }
 
     public static Admin getAdmin() {
@@ -64,7 +66,7 @@ public class Auth {
     }
 
     public static void setAdmin(Admin admin) {
-        Auth.admin = admin;
+        AuthService.admin = admin;
     }
 
     public static Role getLoggedInRole() {
